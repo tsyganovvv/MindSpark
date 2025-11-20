@@ -12,10 +12,9 @@ class NeuroService:
     async def load_model(self):
         try:
             #load_model
-            print("start load model")
             self.tokenizer = GPT2Tokenizer.from_pretrained(settings.MODEL_PATH)
             self.model = GPT2LMHeadModel.from_pretrained(settings.MODEL_PATH)
-            print("continue")
+            
             self.model.to(settings.DEVICE)
             self.is_loaded = True
         except Exception as e:
