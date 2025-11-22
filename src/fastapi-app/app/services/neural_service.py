@@ -2,6 +2,7 @@
 from transformers import GPT2LMHeadModel, GPT2Tokenizer
 from ..config import settings
 import torch
+import re
 
 class NeuroService:
     def __init__(self):
@@ -26,7 +27,13 @@ class NeuroService:
         
         try:
             #tokenizer
-            prompt = f"Пользователь: {message}\nКоуч:"
+            prompt = f"""Ты - профессиональный AI-коуч. Твоя задача - помогать людям в личностном росте.
+
+Пользователь: {message}
+
+Ты должен ответить как коуч: поддерживающе, с эмпатией, задавая уточняющие вопросы и давая практические советы. Будь кратким (2-3 предложения).
+
+Коуч:"""
             inputs = self.tokenizer(prompt, return_tensors="pt")
             inputs = inputs.to(settings.DEVICE)
 
@@ -34,11 +41,14 @@ class NeuroService:
             with torch.no_grad():
                 outputs = self.model.generate(
                     **inputs,
-                    max_length=settings.MAX_LENGTH,
+                    max_length=200,  # Увеличил немного
                     num_return_sequences=1,
-                    temperature=settings.TEMPERATURE,
-                    do_sample=settings.DO_SAMPLE,
-                    pad_token_id=self.tokenizer.eos_token_id
+                    temperature=0.8,  # Чуть более креативно
+                    do_sample=True,
+                    pad_token_id=self.tokenizer.eos_token_id,
+                    repetition_penalty=1.5,  # Штраф за повторения
+                    no_repeat_ngram_size=2,  # Запрет повторяющихся фраз
+                    early_stopping=True
                 )
             #decode
             response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
@@ -48,6 +58,12 @@ class NeuroService:
                 response = full_response.split("Коуч:")[-1].strip()
             
             response = response.split("Пользователь:")[0].strip()
+
+            #clean
+            response = re.sub(r'http\S+', '', response)
+            response = re.sub(r'\d{4}-\d{2}-\d{2}', '', response)
+            response = re.sub(r'Блог:.*', '', response)
+            response = re.sub(r'\n+', ' ', response)
             
             return response if response else "Расскажите подробнее о вашей ситуации."
         
