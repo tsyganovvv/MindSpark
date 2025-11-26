@@ -30,7 +30,6 @@ services:
       - "8000:8000"
     volumes:
       - ./fastapi-app:/app
-      - ./shared:/app/shared
     depends_on:
       postgres:
         condition: service_healthy
