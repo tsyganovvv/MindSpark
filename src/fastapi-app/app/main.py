@@ -1,9 +1,25 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 
-from .routers import chat, health
+from .routers import chat, health, events
+from .database import engine
+from .models.users import Base
 
-app = FastAPI(title="Coach AI API", version="1.0.0")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    
+    yield
+
+    await engine.dispose()
+
+app = FastAPI(title="MindSparkAPI",
+              description="API for MindSpark",
+              version="1.0.0",
+              lifespan=lifespan,
+              )
 
 #settings CORS
 app.add_middleware(
@@ -14,15 +30,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(chat.router, prefix="/api/v1/chat", tags=["chat"])
-app.include_router(health.router, prefix="/api/v1/health", tags=["health"])
-
+app.include_router(events.router, prefix="/events", tags=["events"])
+app.include_router(health.router, prefix="/api/health", tags=["health"])
+app.include_router(chat.router, prefix="/api/chat", tags=["chat"])
 
 @app.get("/")
 async def root():
     return {"message": "Coach AI API is running!"}
-
-@app.get("/health")
-async def health_check():
-    return {"status": "healthy"}
-
