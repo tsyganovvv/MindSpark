@@ -41,14 +41,11 @@ class NeuroService:
             with torch.no_grad():
                 outputs = self.model.generate(
                     **inputs,
-                    max_length=200,  # Увеличил немного
+                    max_length=settings.MAX_LENGTH,
                     num_return_sequences=1,
-                    temperature=0.8,  # Чуть более креативно
-                    do_sample=True,
-                    pad_token_id=self.tokenizer.eos_token_id,
-                    repetition_penalty=1.5,  # Штраф за повторения
-                    no_repeat_ngram_size=2,  # Запрет повторяющихся фраз
-                    early_stopping=True
+                    temperature=settings.TEMPERATURE,
+                    do_sample=settings.DO_SAMPLE,
+                    pad_token_id=self.tokenizer.eos_token_id
                 )
             #decode
             response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
