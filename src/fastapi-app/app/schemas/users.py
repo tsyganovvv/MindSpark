@@ -2,11 +2,13 @@ from pydantic import BaseModel, EmailStr, ConfigDict
 from datetime import datetime
 from typing import Optional
 
+
 class UserCreate(BaseModel):
     email: EmailStr
     username: str
     password: str
     fullname: Optional[str] = None
+
 
 class UserResponce(BaseModel):
     id: int
@@ -23,10 +25,12 @@ class UserResponce(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+
 class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
     username: Optional[str] = None
     fullname: Optional[str] = None
+
 
 class UserLogin(BaseModel):
     email: str

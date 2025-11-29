@@ -1,16 +1,20 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from ..services.neural_service import neuro_service
+from typing import Dict
 
 router = APIRouter()
+
 
 class ChatRequest(BaseModel):
     message: str
     user_id: str = "test_user"
 
+
 class ChatResponse(BaseModel):
     responce: str
     user_id: str
+
 
 @router.post("/message", response_model=ChatResponse)
 async def send_message(request: ChatRequest):
@@ -22,6 +26,8 @@ async def send_message(request: ChatRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.get("/test")
-async def test_chat():
+async def test_chat() -> Dict[str, str]:
     return {"message": "chat router is working"}
+

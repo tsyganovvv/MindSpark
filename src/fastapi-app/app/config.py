@@ -1,7 +1,9 @@
 import os 
 from dotenv import load_dotenv
 
+
 load_dotenv()
+
 
 class Settings:
     DEBUG = os.getenv("DEBUG", "Fasle") == True
@@ -13,4 +15,6 @@ class Settings:
     TEMPERATURE = 0.7
     DO_SAMPLE = True
 
+
 settings = Settings()
+

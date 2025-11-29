@@ -6,14 +6,16 @@ from .routers import chat, health, events
 from .database import engine
 from .models.users import Base
 
+
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> None:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     
     yield
 
     await engine.dispose()
+
 
 app = FastAPI(title="MindSparkAPI",
               description="API for MindSpark",
@@ -34,6 +36,8 @@ app.include_router(events.router, prefix="/events", tags=["events"])
 app.include_router(health.router, prefix="/api/health", tags=["health"])
 app.include_router(chat.router, prefix="/api/chat", tags=["chat"])
 
+
 @app.get("/")
 async def root():
     return {"message": "Coach AI API is running!"}
+
