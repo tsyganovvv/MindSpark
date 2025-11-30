@@ -49,18 +49,14 @@ class NeuroService:
                     temperature=settings.TEMPERATURE,
                     do_sample=settings.DO_SAMPLE,
                     pad_token_id=self.tokenizer.eos_token_id
-                )
-             
+                )      
             #decode
             response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-            if prompt in response:
-                response = response[len(prompt):].strip()
+            parts = response.split("Коуч:")
+            if len(parts) >= 2:        
+                response = parts[-1].strip()
             else:
-                response = response.split("Коуч:")[-1].strip()
-            
-            response = response.split("Пользователь:")[0].strip()
-             
-            #clean
+                response = None
             response = re.sub(r'http\S+', '', response)
             response = re.sub(r'\d{4}-\d{2}-\d{2}', '', response)
             response = re.sub(r'Блог:.*', '', response)

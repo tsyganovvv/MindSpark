@@ -24,3 +24,5 @@ TestResults.xml
 **/.DS_Store
 #__pycache__
 **/__pycache__
+#get-docker.sh
+**/get-docker.sh
