@@ -12,7 +12,7 @@ class ChatRequest(BaseModel):
 
 
 class ChatResponse(BaseModel):
-    responce: str
+    response: str
     user_id: str
 
 
@@ -20,7 +20,7 @@ class ChatResponse(BaseModel):
 async def send_message(request: ChatRequest):
     try:
         response = await neuro_service.generate_response(request.message)
-        return ChatResponse(responce=response,
+        return ChatResponse(response=response,
                             user_id=request.user_id
                             )
     except Exception as e:
