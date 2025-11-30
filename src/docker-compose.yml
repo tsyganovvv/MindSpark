@@ -36,9 +36,19 @@ services:
     networks:
       - mindspark_network
     restart: unless-stopped
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: mindspark_frontend
+    ports:
+      - "80:80"
+    networks:
+      - mindspark_network
+    restart: unless-stopped
+
 volumes:
   postgres_data:
 networks:
   mindspark_network:
     driver: bridge
-
