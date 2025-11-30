@@ -1,5 +1,5 @@
 #type: ignore
-from transformers import GPT2LMHeadModel, GPT2Tokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer
 from ..config import settings
 import torch
 import re
@@ -15,14 +15,17 @@ class NeuroService:
     async def load_model(self) -> None:
         try:
             #load_model
-            self.tokenizer = GPT2Tokenizer.from_pretrained(settings.MODEL_PATH)
-            self.model = GPT2LMHeadModel.from_pretrained(settings.MODEL_PATH)
+            self.tokenizer = AutoTokenizer.from_pretrained(settings.MODEL_PATH)
+            self.model = AutoModelForCausalLM.from_pretrained(
+                    settings.MODEL_PATH,
+                    dtype=torch.float16,
+                    device_map="auto",
+                    )
             
-            self.model.to(settings.DEVICE)
             self.is_loaded = True
          
         except Exception as e:
-            raise Exception("error while load model: {e}")
+            raise Exception(f"error while load model: {e}")
         
     async def generate_response(self, message: str) -> str:
         if not self.is_loaded:
@@ -38,7 +41,6 @@ class NeuroService:
 
 Коуч:"""
             inputs = self.tokenizer(prompt, return_tensors="pt")
-            inputs = inputs.to(settings.DEVICE)
              
             #model
             with torch.no_grad():
@@ -48,15 +50,15 @@ class NeuroService:
                     num_return_sequences=1,
                     temperature=settings.TEMPERATURE,
                     do_sample=settings.DO_SAMPLE,
-                    pad_token_id=self.tokenizer.eos_token_id
+                    pad_token_id=self.tokenizer.eos_token_id,
+                    repetition_penalty=settings.REPETITION_PENALTY,
                 )      
             #decode
             response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-            parts = response.split("Коуч:")
-            if len(parts) >= 2:        
-                response = parts[-1].strip()
-            else:
-                response = None
+
+            if "Коуч:" in response:
+                response = response.split("Коуч:")[-1].strip()
+
             response = re.sub(r'http\S+', '', response)
             response = re.sub(r'\d{4}-\d{2}-\d{2}', '', response)
             response = re.sub(r'Блог:.*', '', response)
