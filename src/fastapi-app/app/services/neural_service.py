@@ -33,21 +33,13 @@ class NeuroService:
         
         try:
             #tokenizer
-            prompt = f"""
-Ты — технический ассистент. Отвечай кратко и информативно.
+            prompt = f"""Ты - профессиональный AI-коуч. Твоя задача - помогать людям в личностном росте.
 
-Формат:
-1. Прямой ответ на вопрос
-2. Конкретные примеры если нужны
-3. Без вводных слов и повторов
+Пользователь: {message}
 
-Если вопрос расплывчатый — уточни детали.
-Если не знаешь — скажи "Не могу помочь с этим вопросом".
+Ты должен ответить как коуч: поддерживающе, с эмпатией, задавая уточняющие вопросы и давая практические советы. Будь кратким (2-3 предложения).
 
-ВОПРОС ПОЛЬЗОВАТЕЛЯ:{message}
-
-ОТВЕТ:
-            """
+Коуч:"""
             inputs = self.tokenizer(prompt, return_tensors="pt")
              
             #model
@@ -64,8 +56,8 @@ class NeuroService:
             #decode
             response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
 
-            if "ОТВЕТ:" in response:
-                response = response.split("ОТВЕТ:")[-1].strip()
+            if "Коуч:" in response:
+                response = response.split("Коуч:")[-1].strip()
 
             response = re.sub(r'http\S+', '', response)
             response = re.sub(r'\d{4}-\d{2}-\d{2}', '', response)
