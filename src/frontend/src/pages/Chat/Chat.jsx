@@ -3,21 +3,25 @@ import React, { useState} from "react"
 export default function Chat(params) {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
   const sendMessage = async() =>{
     if (inputValue === '') return;
     const userMessage = inputValue;
     setInputValue('');
     setMessages([...messages, `You: ${userMessage}`]);
+
+    setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:8000/api/chat/message',{
+      const response = await fetch(`${API_URL}/api/chat/message`,{
         method: 'POST',
-        mode: 'cors',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          message: inputValue,
+          message: userMessage,
           user_id: 'test_user'
         })
       })
@@ -25,8 +29,9 @@ export default function Chat(params) {
 
       setMessages(prev => [...prev, `AI: ${data.response}`]);
     } catch (error){
-      console.log(error)
       setMessages(prev => [...prev, 'AI: Error Connection']);
+    } finally {
+      setIsLoading(false); // Конец загрузки (выполнится в любом случае)
     }
   };
   const handleKeyPress = (e) => {
@@ -34,7 +39,7 @@ export default function Chat(params) {
       sendMessage();
     }
   }
-  
+
   return(
     <div>
       <h1>AI</h1>
@@ -43,6 +48,9 @@ export default function Chat(params) {
           <div key={index}>{msg}</div>
         ))}
       </div>
+      {isLoading && (
+        <div><div>AI is typting...</div></div>
+      )}
       <div>
         <input
         type="text"
