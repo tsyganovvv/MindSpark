@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
-from .routers import chat, health, events
+from .routers import chat, health, auth
 from .database import engine
 from .models.users import Base
 
@@ -32,9 +32,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(events.router, prefix="/events", tags=["events"])
 app.include_router(health.router, prefix="/api/health", tags=["health"])
 app.include_router(chat.router, prefix="/api/chat", tags=["chat"])
+app.include_router(auth.router, prefix="/auth", tags=["auth"])
 
 
 @app.get("/")
