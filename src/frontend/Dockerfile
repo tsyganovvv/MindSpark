@@ -1,9 +1,15 @@
-FROM nginx:alpine
+FROM node:20-alpine
 
-COPY nginx/nginx.conf /etc/nginx/nginx.conf
+WORKDIR /app
 
-COPY static /usr/share/nginx/html
+COPY package.json ./
 
-EXPOSE 80
+RUN npm install --legacy-peer-deps
 
-CMD ["nginx", "-g", "daemon off;"]
+COPY . .
+
+RUN rm -f package-lock.json
+
+EXPOSE 5173
+
+CMD ["npm", "run", "dev", "--", "--host", "--port", "5173"]
