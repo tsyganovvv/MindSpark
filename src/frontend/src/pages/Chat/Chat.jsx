@@ -6,9 +6,9 @@ export default function Chat(params) {
 
   const sendMessage = async() =>{
     if (inputValue === '') return;
+    const userMessage = inputValue;
     setInputValue('');
-    setMessages([...messages, `You: ${inputValue}`]);
-
+    setMessages([...messages, `You: ${userMessage}`]);
     try {
       const response = await fetch('http://localhost:8000/api/chat/message',{
         method: 'POST',
@@ -23,10 +23,10 @@ export default function Chat(params) {
       })
       const data = await response.json();
 
-      setMessages(prev => [...prev, 'AI: ${data.response}']);
+      setMessages(prev => [...prev, `AI: ${data.response}`]);
     } catch (error){
       console.log(error)
-      setMessages(prev => [...prev, `AI: Error Connection`]);
+      setMessages(prev => [...prev, 'AI: Error Connection']);
     }
   };
   const handleKeyPress = (e) => {
