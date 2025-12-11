@@ -1,9 +1,10 @@
 import { useEffect, useState  } from "react"
-import { useSearchParams } from 'react-router-dom';
+import { redirect, useSearchParams } from 'react-router-dom';
 
 export default function AuthGoogleCallback(){
     const [searchParams] = useSearchParams();
     const [user, setUser] = useState(null);
+    const [error, setError] = useState(null);
 
     useEffect(()=> {
         const code = searchParams.get('code');
@@ -11,8 +12,8 @@ export default function AuthGoogleCallback(){
         if (code){
             fetch('http://localhost:8000/auth/google/callback', {
                 method: 'POST',
-                mode: 'cors',
                 credentials: 'include',
+                mode: 'cors',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -26,22 +27,37 @@ export default function AuthGoogleCallback(){
             })
             .then(data => {
                 setUser(data);
+                if (data.error){
+                    setError(data.error)
+                }
             })
             .catch(error => {
-                console.error('Error:', error)
+                console.error('Error:', error);
             });
         }
-    }, [searchParams])
+    }, [searchParams]);
+
     return(
     <>
         <div>
-            {user ? (
+            {error ? (
                 <>
-                    <h2>Hello {user.name}!</h2>
-                    <p>Your email: {user.email}</p>
+                    <h2>Error { user.error }</h2>
+                    <button onClick={ ()=>location.href="/" }>Home</button>
                 </>
             ) : (
-            <h2>Loading user data...</h2>
+                <>
+                    <div>
+                        {user ? (
+                            <>
+                            <h2>Hello {user.name}!</h2>
+                            <p>Your email: {user.email}</p>
+                            </>
+                        ) : (
+                            <h2>Loading Data...</h2>
+                        )}
+                    </div>
+                </>
             )}
         </div>
     </>

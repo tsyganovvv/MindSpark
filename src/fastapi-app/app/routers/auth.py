@@ -1,6 +1,7 @@
 import aiohttp
 import jwt
 from fastapi import APIRouter, Body, Response, Request
+import json
 
 import datetime
 
@@ -17,7 +18,7 @@ def get_google_oauth_redirect_uri():
 
 @router.post("/google/callback")
 async def handle_code(code: str = Body(..., embed=True),
-                    responseCookie: Response = None,
+                    responseAPI: Response = None,
                     request: Request = None,
                     ):
     token = request.cookies.get("access_token")
@@ -70,24 +71,25 @@ async def handle_code(code: str = Body(..., embed=True),
                     "email": user_email,
                     "name": user_name,
                 }
-                print(1)
-                print(f"JWT_SECRET_KEY type: {type(settings.JWT_SECRET_KEY)}")
                 jwt_token = jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm="HS256")
-                print(jwt_token)
-                print(2)
-                responseCookie.set_cookie(
+                content = json.dumps({
+                    "email": user_email,
+                    "name": user_name,
+                    "success": True
+                })
+                responseAPI = Response(
+                    content=content,
+                    media_type="application/json"
+                )
+                responseAPI.set_cookie(
                     key="access_token",
                     value=jwt_token,
                     max_age=3*24*60*60,
                     samesite="lax",
                     secure=False,
                 )
-                
-                return {
-                    "email": user_email,
-                    "name": user_name
-                }
-                
+
+                return responseAPI
             except Exception as e:
                 return {"error": f"Failed to decode token: {str(e)}"}
                 
