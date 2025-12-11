@@ -1,8 +1,9 @@
-import { useEffect } from "react"
+import { useEffect, useState  } from "react"
 import { useSearchParams } from 'react-router-dom';
 
 export default function AuthGoogleCallback(){
-    const [searchParams] = useSearchParams()
+    const [searchParams] = useSearchParams();
+    const [user, setUser] = useState(null);
 
     useEffect(()=> {
         const code = searchParams.get('code');
@@ -14,14 +15,33 @@ export default function AuthGoogleCallback(){
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ 'code' : code })
-            }).catch(error => {
+            })
+            .then(response => {
+                if (!response.ok){
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                setUser(data);
+            })
+            .catch(error => {
                 console.error('Error:', error)
             });
         }
     }, [])
     return(
-        <>
-            <h1>authorization...</h1>
-        </>
+    <>
+        <div>
+            {user ? (
+                <>
+                    <h2>Hello {user.name}!</h2>
+                    <p>Your email: {user.email}</p>
+                </>
+            ) : (
+            <h2>Loading user data...</h2>
+            )}
+        </div>
+    </>
     )
 }
