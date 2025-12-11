@@ -11,10 +11,11 @@ export default function AuthGoogleCallback(){
         if (code){
             fetch('http://localhost:8000/auth/google/callback', {
                 method: 'POST',
+                mode: 'cors',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ 'code' : code })
+                body: JSON.stringify({ code : code })
             })
             .then(response => {
                 if (!response.ok){
@@ -29,7 +30,7 @@ export default function AuthGoogleCallback(){
                 console.error('Error:', error)
             });
         }
-    }, [])
+    }, [searchParams])
     return(
     <>
         <div>
