@@ -8,7 +8,13 @@ export default defineConfig({
   server: {
     host: 'localhost',
     port: 5173,
-    allowedHosts: ['mind-spark.ru', 'localhost'],
+    allowedHosts: ['*'],
+    headers: {
+      'access-control-allow-origin': '*',
+      'access-control-allow-methods': '*',
+      'access-control-allow-headers': '*',
+      'access-control-allow-credentials': '*'
+    }
   },
   resolve: {
     alias: {

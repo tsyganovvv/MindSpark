@@ -1,7 +1,6 @@
 import aiohttp
 
 from fastapi import APIRouter, Body
-from fastapi.responses import RedirectResponse
 
 from ..services.outh_google import generate_google_oauth_redirect_uri
 from ..config import settings
@@ -11,7 +10,7 @@ router = APIRouter()
 @router.get("/google/url")
 def get_google_oauth_redirect_uri():
     uri = generate_google_oauth_redirect_uri()
-    return RedirectResponse(url=uri, status_code=302)
+    return {"url": uri}
 
 
 @router.post("/google/callback")
@@ -26,7 +25,7 @@ async def handle_code(
             "client_id":settings.OAUTH_GOOGLE_CLIENT_ID,
             "client_secret":settings.OAUTH_GOOGLE_CLIENT_SECRET,
             "grant_type":"authorization_code",
-            "redirect_uri":"http://localhost:80/auth/google",
+            "redirect_uri":"http://localhost:5173/auth/google",
             "code":code,
         },
         ssl=False,

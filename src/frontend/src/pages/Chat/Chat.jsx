@@ -31,7 +31,7 @@ export default function Chat(params) {
     } catch (error){
       setMessages(prev => [...prev, 'AI: Error Connection']);
     } finally {
-      setIsLoading(false); // Конец загрузки (выполнится в любом случае)
+      setIsLoading(false);
     }
   };
   const handleKeyPress = (e) => {

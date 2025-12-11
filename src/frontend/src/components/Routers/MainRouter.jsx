@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import Home from '@/pages/Home/Home';
 import Chat from '@/pages/Chat/Chat';
 import Auth from '@/pages/Auth/Auth';
+import AuthGoogleCallback from '@/pages/Auth/Google/AuthGoogleCallback'
 
 
 export default function MainRouter() {
@@ -20,6 +21,7 @@ export default function MainRouter() {
       <Route path="/" element={<Home/>}></Route>
       <Route path="/chat" element={<Chat/>}></Route>
       <Route path="/auth" element={<Auth/>}></Route>
+      <Route path="/auth/google" element={<AuthGoogleCallback/>}></Route>
     </Routes>
     <footer>
       <div>
