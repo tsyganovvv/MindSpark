@@ -12,6 +12,7 @@ export default function AuthGoogleCallback(){
             fetch('http://localhost:8000/auth/google/callback', {
                 method: 'POST',
                 mode: 'cors',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                 },

@@ -23,6 +23,8 @@ class Settings:
     DO_SAMPLE = True
     REPETITION_PENALTY=1.3
 
+    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "sheb45fljrw435kgndk3")
+
 
 settings = Settings()
 
