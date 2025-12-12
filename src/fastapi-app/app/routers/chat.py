@@ -3,6 +3,8 @@ from pydantic import BaseModel
 from ..services.neural_service import neuro_service
 from typing import Dict
 
+import time #for tests
+
 router = APIRouter()
 
 
@@ -19,7 +21,8 @@ class ChatResponse(BaseModel):
 @router.post("/message", response_model=ChatResponse)
 async def send_message(request: ChatRequest):
     try:
-        response = await neuro_service.generate_response(request.message)
+        time.sleep(3)
+        response = "answer" #await neuro_service.generate_response(request.message)
         return ChatResponse(response=response,
                             user_id=request.user_id
                             )
