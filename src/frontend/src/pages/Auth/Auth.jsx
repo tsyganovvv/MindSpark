@@ -1,4 +1,9 @@
 export default function Auth(params){
+  function HasAccessCookie(){
+    const cookies = document.cookie
+    const hasAccessToken = cookies.includes("access_token")
+    return hasAccessToken
+  }
   async function GetGoogleAuthUrl(e) {
     e.preventDefault();
 
@@ -21,7 +26,7 @@ export default function Auth(params){
   return(
     <>
       <h1>Auth</h1>
-      <a href="#" onClick={ GetGoogleAuthUrl }>Google</a>
+      <a href="#" onClick={ !HasAccessCookie() ? GetGoogleAuthUrl : location.href="/auth/google?code=auth" }>Google</a>
     </>
   )
 }

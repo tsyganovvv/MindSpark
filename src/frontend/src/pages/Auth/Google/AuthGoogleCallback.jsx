@@ -8,7 +8,7 @@ export default function AuthGoogleCallback(){
 
     useEffect(()=> {
         const code = searchParams.get('code');
-
+        
         if (code){
             fetch('http://localhost:8000/auth/google/callback', {
                 method: 'POST',
@@ -34,6 +34,8 @@ export default function AuthGoogleCallback(){
             .catch(error => {
                 console.error('Error:', error);
             });
+        }else{
+            setError('No Auth data')
         }
     }, [searchParams]);
 
@@ -42,8 +44,8 @@ export default function AuthGoogleCallback(){
         <div>
             {error ? (
                 <>
-                    <h2>Error { user.error }</h2>
-                    <button onClick={ ()=>location.href="/" }>Home</button>
+                    <h2>Error { error }</h2>
+                    <button onClick={ ()=>location.href="/auth" }>AUTH</button>
                 </>
             ) : (
                 <>
