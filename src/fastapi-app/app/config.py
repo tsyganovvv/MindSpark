@@ -1,30 +1,27 @@
-import os 
-from dotenv import load_dotenv
+from pydantic_settings import SettingsConfigDict, BaseSettings
 
 
-load_dotenv()
+class Settings(BaseSettings):
+    DOMEN: str
+    
+    OAUTH_GOOGLE_CLIENT_SECRET: str
+    OAUTH_GOOGLE_CLIENT_ID: str
+    GOOGLE_TOKEN_URL: str
 
 
-class Settings:
-    DOMEN=os.getenv("DOMEN", "mind-spark.ru")
+    DEBUG:str
+    MODEL_NAME: str
+    DEVICE: str
+    MODEL_PATH: str
 
-    OAUTH_GOOGLE_CLIENT_SECRET=os.getenv("OAUTH_GOOGLE_CLIENT_SECRET", "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")
-    OAUTH_GOOGLE_CLIENT_ID=os.getenv("OAUTH_GOOGLE_CLIENT_ID", "841010799248-tjvrjnptvs6868gshcdsthnau1k6bf51.apps.googleusercontent.com")
-    GOOGLE_TOKEN_URL=os.getenv("GOOGLE_TOKEN_URL", "https://oauth2.googleapis.com/token")
+    MAX_LENGTH: int
+    TEMPERATURE: float
+    DO_SAMPLE: bool
+    REPETITION_PENALTY: float
 
+    JWT_SECRET_KEY: str
 
-    DEBUG = os.getenv("DEBUG", "Fasle") == True
-    MODEL_NAME = os.getenv("MODEL_NAME", "rugpt3small_based_on_gpt2")
-    DEVICE = os.getenv("DEVICE", "cpu")
-    MODEL_PATH = os.getenv("MODEL_PATH", "ai-forever/rugpt3small_based_on_gpt2")
-
-    MAX_LENGTH = 150
-    TEMPERATURE = 0.7
-    DO_SAMPLE = True
-    REPETITION_PENALTY=1.3
-
-    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "sheb45fljrw435kgndk3")
+    model_config = SettingsConfigDict(env_file='app/.env')
 
 
 settings = Settings()
-
