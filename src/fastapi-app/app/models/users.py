@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, Text
+from sqlalchemy import Boolean, Column, DateTime, Integer, String
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.sql import func
 
@@ -14,7 +14,7 @@ class User(Base):
     email = Column(String(50), unique=True, index=True, nullable=False)
     username = Column(String(50), unique=True, index=True, nullable=False)
     hashed_password = Column(String(255), nullable=False)
-    
+
     is_activate = Column(Boolean, default=False)
     is_verified = Column(Boolean, default=False)
 
@@ -24,4 +24,3 @@ class User(Base):
 
     def __repr__(self) -> str:
         return f"<User(id={self.id}, email={self.email}, username={self.username})>"
-

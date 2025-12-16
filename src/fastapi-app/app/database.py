@@ -1,6 +1,4 @@
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-import os
-
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 DATABASE_URL = "postgresql+asyncpg://user:Main0228@postgres:5432/mindspark"
 
@@ -23,4 +21,3 @@ async def get_db() -> None:
             yield session
         finally:
             await session.close()
-

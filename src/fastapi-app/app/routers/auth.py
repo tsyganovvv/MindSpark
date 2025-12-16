@@ -1,14 +1,14 @@
-import aiohttp
-import jwt
-from fastapi import APIRouter, Body, Response, Request
 import json
 
-import datetime
+import aiohttp
+import jwt
+from fastapi import APIRouter, Body, Request, Response
 
-from ..services.outh_google import generate_google_oauth_redirect_uri
 from ..config import settings
+from ..services.outh_google import generate_google_oauth_redirect_uri
 
 router = APIRouter()
+
 
 @router.get("/google/url")
 def get_google_oauth_redirect_uri():
@@ -17,74 +17,69 @@ def get_google_oauth_redirect_uri():
 
 
 @router.post("/google/callback")
-async def handle_code(code: str = Body(..., embed=True),
-                    responseAPI: Response = None,
-                    request: Request = None,
-                    ):
+async def handle_code(
+    code: str = Body(..., embed=True),
+    responseAPI: Response = None,
+    request: Request = None,
+):
     token = request.cookies.get("access_token")
     if token:
         try:
             payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=["HS256"])
             user_email = payload.get("email")
             user_name = payload.get("name")
-            return {
-                "email": user_email,
-                "name": user_name
-            }
+            return {"email": user_email, "name": user_name}
         except Exception as e:
             print(e)
     try:
         google_token_url = settings.GOOGLE_TOKEN_URL
-        
-        async with aiohttp.ClientSession() as session, session.post(
-            url=google_token_url,
-            data={
-                "client_id": settings.OAUTH_GOOGLE_CLIENT_ID,
-                "client_secret": settings.OAUTH_GOOGLE_CLIENT_SECRET,
-                "grant_type": "authorization_code",
-                "redirect_uri": "http://localhost:5173/auth/google",
-                "code": code,
-            },
-            ssl=False,
-        ) as response:
+
+        async with (
+            aiohttp.ClientSession() as session,
+            session.post(
+                url=google_token_url,
+                data={
+                    "client_id": settings.OAUTH_GOOGLE_CLIENT_ID,
+                    "client_secret": settings.OAUTH_GOOGLE_CLIENT_SECRET,
+                    "grant_type": "authorization_code",
+                    "redirect_uri": "http://localhost:5173/auth/google",
+                    "code": code,
+                },
+                ssl=False,
+            ) as response,
+        ):
             token_data = await response.json()
-            
+
             if "error" in token_data:
                 return {
                     "error": token_data.get("error_description", token_data["error"])
                 }
-            
+
             id_token_jwt = token_data.get("id_token")
-            
+
             if not id_token_jwt:
                 return {"error": "No id_token received from Google"}
-            
+
             try:
-                decoded = jwt.decode(
-                    id_token_jwt, 
-                    options={"verify_signature": False}
-                )
-                
+                decoded = jwt.decode(id_token_jwt, options={"verify_signature": False})
+
                 user_email = decoded.get("email")
                 user_name = decoded.get("name", "No name")
                 payload = {
                     "email": user_email,
                     "name": user_name,
                 }
-                jwt_token = jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm="HS256")
-                content = json.dumps({
-                    "email": user_email,
-                    "name": user_name,
-                    "success": True
-                })
-                responseAPI = Response(
-                    content=content,
-                    media_type="application/json"
+                jwt_token = jwt.encode(
+                    payload, settings.JWT_SECRET_KEY, algorithm="HS256"
                 )
+                content = json.dumps(
+                    {"email": user_email, "name": user_name, "success": True}
+                )
+                responseAPI = Response(content=content, media_type="application/json")
                 responseAPI.set_cookie(
                     key="access_token",
                     value=jwt_token,
-                    max_age=3*24*60*60,
+                    max_age=3 * 24 * 60 * 60,
                     samesite="lax",
                     secure=False,
                 )
@@ -92,7 +87,6 @@ async def handle_code(code: str = Body(..., embed=True),
                 return responseAPI
             except Exception as e:
                 return {"error": f"Failed to decode token: {str(e)}"}
-                
+
     except Exception as e:
         return {"error": f"Internal server error: {str(e)}"}
-

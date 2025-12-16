@@ -1,15 +1,14 @@
-from pydantic_settings import SettingsConfigDict, BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     DOMEN: str
-    
+
     OAUTH_GOOGLE_CLIENT_SECRET: str
     OAUTH_GOOGLE_CLIENT_ID: str
     GOOGLE_TOKEN_URL: str
 
-
-    DEBUG:str
+    DEBUG: str
     MODEL_NAME: str
     DEVICE: str
     MODEL_PATH: str
@@ -21,7 +20,7 @@ class Settings(BaseSettings):
 
     JWT_SECRET_KEY: str
 
-    model_config = SettingsConfigDict(env_file='app/.env')
+    model_config = SettingsConfigDict(env_file="app/.env")
 
 
 settings = Settings()

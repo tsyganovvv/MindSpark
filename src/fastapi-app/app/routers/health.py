@@ -1,5 +1,6 @@
-from fastapi import APIRouter
 from typing import Dict
+
+from fastapi import APIRouter
 
 router = APIRouter()
 
@@ -10,10 +11,5 @@ async def health():
 
 
 @router.get("/detailed")
-async def detailed_health() -> Dict[str, str]:
-    return {
-        "status": "healthy",
-        "service": "AI Coach API", 
-        "version": "1.0.0"
-    }
-
+async def detailed_health() -> dict[str, str]:
+    return {"status": "healthy", "service": "AI Coach API", "version": "1.0.0"}

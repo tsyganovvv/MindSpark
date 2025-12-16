@@ -1,12 +1,13 @@
-#type: ignore
-from transformers import AutoModelForCausalLM, AutoTokenizer
-from ..config import settings
-import torch
+# type: ignore
 import re
+
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+from ..config import settings
 
 
 class NeuroService:
-        
     def __init__(self) -> None:
         self.model = None
         self.tokenizer = None
@@ -14,25 +15,25 @@ class NeuroService:
 
     async def load_model(self) -> None:
         try:
-            #load_model
+            # load_model
             self.tokenizer = AutoTokenizer.from_pretrained(settings.MODEL_PATH)
             self.model = AutoModelForCausalLM.from_pretrained(
-                    settings.MODEL_PATH,
-                    dtype=torch.float16,
-                    device_map="auto",
-                    )
-            
+                settings.MODEL_PATH,
+                dtype=torch.float16,
+                device_map="auto",
+            )
+
             self.is_loaded = True
-         
+
         except Exception as e:
             raise Exception(f"error while load model: {e}")
-        
+
     async def generate_response(self, message: str) -> str:
         if not self.is_loaded:
             await self.load_model()
-        
+
         try:
-            #tokenizer
+            # tokenizer
             prompt = f"""
 Ты — технический ассистент. Отвечай кратко и информативно.
 
@@ -49,8 +50,8 @@ class NeuroService:
 ОТВЕТ:
             """
             inputs = self.tokenizer(prompt, return_tensors="pt")
-             
-            #model
+
+            # model
             with torch.no_grad():
                 outputs = self.model.generate(
                     **inputs,
@@ -60,22 +61,22 @@ class NeuroService:
                     do_sample=settings.DO_SAMPLE,
                     pad_token_id=self.tokenizer.eos_token_id,
                     repetition_penalty=settings.REPETITION_PENALTY,
-                )      
-            #decode
+                )
+            # decode
             response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
 
             if "ОТВЕТ:" in response:
                 response = response.split("ОТВЕТ:")[-1].strip()
 
-            response = re.sub(r'http\S+', '', response)
-            response = re.sub(r'\d{4}-\d{2}-\d{2}', '', response)
-            response = re.sub(r'Блог:.*', '', response)
-            response = re.sub(r'\n+', ' ', response)
-             
+            response = re.sub(r"http\S+", "", response)
+            response = re.sub(r"\d{4}-\d{2}-\d{2}", "", response)
+            response = re.sub(r"Блог:.*", "", response)
+            response = re.sub(r"\n+", " ", response)
+
             return response if response else "Расскажите подробнее о вашей ситуации."
-         
+
         except Exception as e:
             return f"sorry, error: {e}"
 
-neuro_service = NeuroService()
 
+neuro_service = NeuroService()
